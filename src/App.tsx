@@ -1,6 +1,5 @@
 import { useState } from "react";
 import "./App.css";
-import intervalToDuration from "date-fns/intervalToDuration";
 import dayjs from "dayjs";
 
 function App() {
