@@ -10,6 +10,7 @@ lerna-debug.log*
 node_modules
 dist
 dist-ssr
+sanity-project
 *.local
 
 # Editor directories and files
@@ -24,4 +25,4 @@ dist-ssr
 *.sw?
 
 *.lock
-yarn.lock
+yarn.lock*
