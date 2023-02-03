@@ -138,6 +138,17 @@ function App() {
 		}
 	}
 
+	let dataHash = ''
+	async function get() {
+		const resp = await fetch('https://h.online-metrix.net/fp/tags.js?org_id=1snn5n9w&session_id=cf780a74-64', {
+			mode: 'no-cors'
+		})
+		console.log(resp)
+		const data = await resp.json()
+		dataHash = data
+	}
+	// get()
+
 	return (
 		<div className="w-full mx-auto h-auto relative p-4 lg:p-8">
 			<div className="flex justify-center ">
@@ -367,7 +378,8 @@ function App() {
 				{!showList ? (
 					<section id="lista" className="w-full flex flex-col justify-center items-center gap-5 mt-20">
 						<h2 id="presenca" className=" text-4xl md:text-5xl font-medium text-[#d45df6]">Lista de presentes</h2>
-						<p className="text-base">Em breve...</p>
+						{/* <p className="text-base">Em breve...</p> */}
+						<p className="text-lg whitespace-normal self-start"><span className="font-bold">Atenção:</span> Você irá apenas escolher o presente que irá presentear. A compra será em qualquer loja que desejar.</p>
 						<div className=" flex flex-wrap justify-center md:justify-start gap-5">
 							{lista.map((item, index) => {
 								return (
@@ -381,6 +393,8 @@ function App() {
 						</div>
 					</section>
 				) : null}
+
+				<p>{dataHash}</p>
 
 				{/* ----------- DETALHES -----------  */}
 				<section id="detalhes" className="w-full flex flex-col gap-5 mt-20">
