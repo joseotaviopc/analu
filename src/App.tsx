@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import dayjs from "dayjs";
 import client from "./lib/sanity.config";
 import { uuid } from '@sanity/uuid'
-import { FiMapPin } from 'react-icons/fi'
+import { FiMapPin, FiPhoneCall } from 'react-icons/fi'
 
 /* ---------- Validation ---------- */
 import { Formik, Form, Field } from 'formik'
@@ -31,6 +31,7 @@ function App() {
 	const diasRestantes = dayjs("2023-02-14 14:00").diff(today, "days");
 	const horasRestantes = dayjs("2023-02-14 14:00").diff(today, "hours");
 	const [confirmMessage, setConfirmMessage] = useState('')
+	const [disableButton, setDisableButton] = useState(false)
 
 	async function saveInSanity(userDoc: TForm) {
 		setConfirmMessage('Aguarde...');
@@ -45,7 +46,8 @@ function App() {
 		}
 	}
 
-	async function handleSubmit(values: TForm) {
+	async function handleSubmit(values: TForm, reset: () => void) {
+		setDisableButton(true)
 		const escorts: string[] = []
 		values.escort_names?.split(',').forEach((item: string) => escorts.push(item.trim()))
 		const data = {
@@ -66,6 +68,7 @@ function App() {
 		}
 
 		saveInSanity(data)
+		reset()
 	}
 
 	useEffect(() => {
@@ -74,6 +77,7 @@ function App() {
     const getDataFromSanity = async (sanityClient = client) => {
 			const query = `*[_type == "guests"] {
 				confirm,
+				escorts_quantity,
 			}`
 
       const data = await sanityClient.fetch(query)
@@ -82,10 +86,13 @@ function App() {
 
       if (!data) return
 
-			const confirmed = data.filter((item: TForm) => item.confirm === "sim")
-			console.log(confirmed)
+			// const escorts = data.reduce((acc: number, curr: TForm) => acc + curr.escorts_quantity, 0)
+			const confirmed = data.reduce((acc: number, curr: TForm) => acc + curr.escorts_quantity, 0) + data.filter((item: TForm) => item.confirm === "sim").length
 
-      setGuestsConfirmed(confirmed.length)
+			console.log('Total confirmed', confirmed)
+
+      setGuestsConfirmed(confirmed)
+			setDisableButton(false)
     }
 
     getDataFromSanity()
@@ -100,9 +107,9 @@ function App() {
     name: Yup.string()
       .matches(
         /^([A-Za-z\u00C0-\u00D6\u00D8-\u00f6\u00f8-\u00ff\s]*)$/gi,
-        'Nome só pode conter letras.'
+        '* Nome só pode conter letras.'
       )
-      .required('*Campo obrigatório'),
+      .required('* Campo obrigatório'),
     confirm: Yup.boolean(),
 		no_confirm: Yup.boolean(),
 		has_escorts: Yup.boolean(),
@@ -112,29 +119,29 @@ function App() {
   })
 
 	return (
-		<div className="w-full h-auto relative">
+		<div className="w-full mx-auto h-auto relative p-4 lg:p-8">
 			<div className="flex justify-center ">
-				<h1 id="title" className="font-medium text-[#d45df6]">Chá da Analu - 12/02/2023</h1>
+				<h1 id="title" className="font-medium text-4xl md:text-5xl text-[#d45df6]">Chá da Analu - 12/02/2023</h1>
 			</div>
 			<div className="w-full h-auto mt-10">
 
-				{/* NAV */}
-				<ul className="w-3/4 flex mt-10 mx-auto ">
-					<a href="#evento" className="text-gray-50 whitespace-nowrap opacity-70 hover:opacity-100 w-full cursor-pointer font-medium bg-[#d45df6] rounded-t-md p-2 border-t-[1px] border-l-[1px] border-r-[1px] border-[#b32ed8]">
+				{/* ----------- NAV -----------  */}
+				<ul className="w-full md:w-3/4 flex mt-10 mx-auto ">
+					<a href="#evento" className="text-gray-50 whitespace-nowrap opacity-70 hover:text-white hover:opacity-100 w-full cursor-pointer font-medium bg-[#d45df6] rounded-t-md p-2 border-t-[1px] border-l-[1px] border-r-[1px] border-[#b32ed8]">
 					<li>
 						Evento
 					</li></a>
-					<a href="#presenca" className="text-gray-50 whitespace-nowrap opacity-70 hover:opacity-100 w-full cursor-pointer font-medium bg-[#d45df6] rounded-t-md p-2 border-t-[1px] border-l-[1px] border-r-[1px] border-[#b32ed8]"><li>
+					<a href="#presenca" className="text-gray-50 whitespace-nowrap opacity-70 hover:text-white hover:opacity-100 w-full cursor-pointer font-medium bg-[#d45df6] rounded-t-md p-2 border-t-[1px] border-l-[1px] border-r-[1px] border-[#b32ed8]"><li>
 						Confirmar Presença
 					</li></a>
-					<a href="#detalhes" className="text-gray-50 whitespace-nowrap opacity-70 hover:opacity-100 w-full cursor-pointer font-medium bg-[#d45df6] rounded-t-md p-2 border-t-[1px] border-l-[1px] border-r-[1px] border-[#b32ed8]">
+					<a href="#detalhes" className="text-gray-50 whitespace-nowrap opacity-70 hover:text-white hover:opacity-100 w-full cursor-pointer font-medium bg-[#d45df6] rounded-t-md p-2 border-t-[1px] border-l-[1px] border-r-[1px] border-[#b32ed8]">
 					<li>
 						+ Detalhes
 					</li></a>
 				</ul>
 				<div className="h-[1px] bg-[#d45df6] w-full"></div>
 
-				{/* EVENTO */}
+				{/* ----------- EVENTO -----------  */}
 				<section id="evento" className="w-full flex flex-col-reverse gap-5 lg:flex-row mt-10 ">
 					<div className="w-full lg:w-1/2 flex flex-col">
 						<div className="self-start">
@@ -153,14 +160,14 @@ function App() {
             <div className="self-start mt-5">
 							<h2 className="font-medium text-left">Local do Evento</h2>
 							<p className="flex gap-2">Rua César Gonçalves dos Santos, 168 - Niterói-RJ
-								<a href="https://goo.gl/maps/tc5bGFGQjBsjHwMfA" target={"_blank"} rel="noreferrer"> <FiMapPin className="cursor-pointer" size={20} color="white" /></a>
+								<a href="https://goo.gl/maps/tc5bGFGQjBsjHwMfA" target={"_blank"} rel="noreferrer"> <FiMapPin className="cursor-pointer" size={20} color="#b32ed8" /></a>
 							</p>
 						</div>
 
             <div className="self-start mt-5">
 							<h2 className="font-medium text-left">Contato</h2>
-							<a href="tel:21977429776">(21) 97742-9776</a><br />
-							<a href="tel:21969962000">(21) 96996-2000</a>
+							<a href="tel:21977429776" className="flex cursor-pointer gap-2 items-center" ><FiPhoneCall size={20} color="#b32ed8" />(21) 97742-9776</a>
+							<a href="tel:21969962000" className="flex cursor-pointer gap-2 items-center" ><FiPhoneCall size={20} color="#b32ed8" />(21) 96996-2000</a>
 						</div>
 
 						<div className="self-start mt-5">
@@ -181,15 +188,15 @@ function App() {
 					</div>
 				</section>
 
-				{/* PRESENÇA */}
+				{/* ----------- PRESENÇA -----------  */}
 				<section className="w-full flex flex-col gap-5 mt-20">
-					<h2 id="presenca" className="whitespace-nowrap text-5xl font-medium text-[#d45df6]">Confirme sua presença</h2>
+					<h2 id="presenca" className=" text-4xl md:text-5xl font-medium text-[#d45df6]">Confirme sua presença</h2>
 					{confirmMessage !== '' ? (
-						<div className="flex items-baseline gap-2">
+						<div className="flex flex-col md:flex-row items-baseline gap-2">
 							<h2 className="whitespace-nowrap text-3xl font-medium text-[#d45df6]">{confirmMessage}</h2>
 							{confirmMessage === 'Obrigado!' ? (
-								<h2 className="whitespace-nowrap text-xl font-medium text-[#d45df6]">
-									{` - Já temos ${guestsConfirmed} convidado${guestsConfirmed > 1 ? 's' : ''}`}
+								<h2 className=" text-xl font-medium text-[#d45df6]">
+									{`Já temos ${guestsConfirmed} convidado${guestsConfirmed > 1 ? 's' : ''}`}
 								</h2>
 							) : null }
 						</div>
@@ -208,7 +215,8 @@ function App() {
           touched,
           isSubmitting,
           setFieldValue,
-          handleBlur
+          handleBlur,
+					resetForm
         }) => (
           <Form>
 							<div className="flex items-center mt-5">
@@ -251,6 +259,7 @@ function App() {
 							<div className="flex flex-col items-start justify-center mt-5">
 								<label className={`${values.confirm === false ? 'text-[#d45df6]' : 'text-[#b32ed8]'} font-medium`} htmlFor="name">
 									Nome e sobrenome
+									<span className="ml-4 text-xs font-normal text-red-600">{errors.name ? `${errors.name}` : ''}</span>
 								</label>
 								<Field
 									type="text"
@@ -311,8 +320,8 @@ function App() {
 						{values.confirm !== null ? (
 							<button
 								type="submit"
-								onClick={() => handleSubmit(values)}
-								disabled={isSubmitting}
+								onClick={() => handleSubmit(values, resetForm)}
+								disabled={disableButton || !!errors.name}
 								className="w-auto mt-5 cursor-pointer disabled:opacity-60 disabled:cursor-default disabled:bg-opacity-50 shadow-md border-[1px] border-[#b32ed8] bg-[#b32ed8] rounded-lg p-2"
 							>
 								{values.confirm === "sim" ? `Oba, confirme!` : `Poxa...`}
@@ -324,6 +333,8 @@ function App() {
 					)}
         </Formik>
 				</section>
+
+				{/* ----------- DETALHES -----------  */}
 				<section id="detalhes" className="w-full flex flex-col gap-5 mt-20">
 					<iframe
 						src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d918.4620984813396!2d-43.03091831188968!3d-22.955809864159722!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x99863d5f93592d%3A0xb2b8aee90b2c69f6!2sR.%20C%C3%A9sar%20Gon%C3%A7alves%20dos%20Santos%2C%20168%20-%20Itaipu%2C%20Niter%C3%B3i%20-%20RJ%2C%2024346-113!5e0!3m2!1spt-BR!2sbr!4v1675368586596!5m2!1spt-BR!2sbr"
@@ -335,7 +346,7 @@ function App() {
 				</section>
 			</div>
 
-			{/* GOTO_TOP */}
+			{/* ----------- GOTO_TOP ----------- */}
 			<a href="#title" className="fixed bottom-5 right-5 rounded-full bg-[#d45df6] p-1 opacity-70 hover:opacity-100">
 				<svg width="24px" height="24px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
 				<path fillRule="evenodd" clipRule="evenodd" d="M5.46967 14.5303C5.17678 14.2374 5.17678 13.7626 5.46967 13.4697L11.4697 7.46967C11.7626 7.17678 12.2374 7.17678 12.5303 7.46967L18.5303 13.4697C18.8232 13.7626 18.8232 14.2374 18.5303 14.5303C18.2374 14.8232 17.7626 14.8232 17.4697 14.5303L12 9.06066L6.53033 14.5303C6.23744 14.8232 5.76256 14.8232 5.46967 14.5303Z" fill="#b32ed8"/>

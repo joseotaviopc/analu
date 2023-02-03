@@ -15,14 +15,14 @@
 	font-weight: 200;
 
 	color-scheme: light dark;
-	color: rgba(255, 255, 255, 0.9);
-	background: rgb(227, 148, 231);
-	background: linear-gradient(
+	color: rgba(0, 0, 0, 0.75);
+	background: rgb(252, 215, 255, 1);
+	/* background: linear-gradient(
 		45deg,
 		rgba(224, 126, 251, 1) 0%,
-		rgba(227, 148, 231, 1) 35%,
+		rgba(179, 46, 216, 0.75) 35%,
 		rgba(252, 215, 255, 1) 100%
-	);
+	); */
 
 	font-synthesis: none;
 	text-rendering: optimizeLegibility;
@@ -33,18 +33,18 @@
 
 a {
 	font-weight: 500;
-	color: rgba(255, 255, 255, 0.7);
+	color: rgba(179, 46, 216, 0.75);
 	text-decoration: inherit;
 }
 
 a:hover {
-	color: rgba(255, 255, 255, 1);
+	color: rgba(179, 46, 216, 0.25);
 }
 
 body {
-	margin: 0;
+	/* margin: 0;
 	display: flex;
-	min-width: 320px;
+	min-width: 320px; */
 	/* min-height: 100vh; */
 }
 
@@ -59,19 +59,19 @@ button {
 	padding: 0.6em 1.2em;
 	font-size: 1em;
 	font-weight: 500;
-	font-family: inherit;
-	background-color: #1a1a1a;
+	/* font-family: inherit; */
+	/* background-color: #1a1a1a; */
 	cursor: pointer;
 	transition: border-color 0.25s;
 }
 
 button:hover {
-	border-color: #646cff;
+	/* border-color: #646cff; */
 }
 
 button:focus,
 button:focus-visible {
-	outline: 4px auto -webkit-focus-ring-color;
+	/* outline: 4px auto -webkit-focus-ring-color; */
 }
 
 ​textarea {
@@ -80,18 +80,22 @@ button:focus-visible {
 
 ​ @media (prefers-color-scheme: light) {
 	:root {
-		color: rgba(255, 255, 255, 0.9);
-		background: rgb(227, 148, 231);
-		background: linear-gradient(
-			45deg,
-			rgba(224, 126, 251, 1) 0%,
-			rgba(227, 148, 231, 1) 35%,
-			rgba(252, 215, 255, 1) 100%
-		);
+		color: rgba(0, 0, 0, 0.75);
+		background: rgb(252, 215, 255, 1);
+		/* background: linear-gradient(
+		 45deg,
+		 rgba(224, 126, 251, 1) 0%,
+		 rgba(179, 46, 216, 0.75) 35%,
+		 rgba(252, 215, 255, 1) 100%
+		 ); */
+	}
+
+	a {
+		color: rgba(179, 46, 216, 0.75);
 	}
 
 	a:hover {
-		color: #747bff;
+		color: rgba(179, 46, 216, 0.25);
 	}
 
 	button {
