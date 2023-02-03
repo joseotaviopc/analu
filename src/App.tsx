@@ -9,6 +9,8 @@ import { FiMapPin, FiPhoneCall } from 'react-icons/fi'
 import { Formik, Form, Field } from 'formik'
 import * as Yup from 'yup'
 
+import { lista } from './list'
+import ImgBaba from '../src/assets/baba-elet.webp'
 import "./App.css";
 
 const initForm = {
@@ -26,12 +28,15 @@ const initForm = {
 type TForm = typeof initForm
 
 function App() {
-	const [guestsConfirmed, setGuestsConfirmed] = useState(0);
 	const today = dayjs();
 	const diasRestantes = dayjs("2023-02-14 14:00").diff(today, "days");
 	const horasRestantes = dayjs("2023-02-14 14:00").diff(today, "hours");
+
+	const [guestsConfirmed, setGuestsConfirmed] = useState(0);
 	const [confirmMessage, setConfirmMessage] = useState('')
 	const [disableButton, setDisableButton] = useState(false)
+	const [showList, setShowList] = useState(false)
+	const [presente, setPresente] = useState(false)
 
 	async function saveInSanity(userDoc: TForm) {
 		setConfirmMessage('Aguarde...');
@@ -67,9 +72,15 @@ function App() {
 			message: values.message
 		}
 
-		saveInSanity(data)
+		// saveInSanity(data)
+		setShowList(true)
 		reset()
 	}
+
+	// function scrollToElement(id: string) {
+	// 	const element = document.getElementById(id);
+	// 	element?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+	// }
 
 	useEffect(() => {
 		let unmounted = false
@@ -93,6 +104,9 @@ function App() {
 
       setGuestsConfirmed(confirmed)
 			setDisableButton(false)
+			// setTimeout(() => {
+			// 	setShowList(prev => true)
+			// }, 2000)
     }
 
     getDataFromSanity()
@@ -118,11 +132,18 @@ function App() {
 		escort_names: Yup.string()
   })
 
+	function handlePresente() {
+		if (!presente) {
+			setPresente(!presente)
+		}
+	}
+
 	return (
 		<div className="w-full mx-auto h-auto relative p-4 lg:p-8">
 			<div className="flex justify-center ">
 				<h1 id="title" className="font-medium text-4xl md:text-5xl text-[#d45df6]">Chá da Analu - 12/02/2023</h1>
 			</div>
+
 			<div className="w-full h-auto mt-10">
 
 				{/* ----------- NAV -----------  */}
@@ -131,9 +152,15 @@ function App() {
 					<li>
 						Evento
 					</li></a>
-					<a href="#presenca" className="text-gray-50 whitespace-nowrap opacity-70 hover:text-white hover:opacity-100 w-full cursor-pointer font-medium bg-[#d45df6] rounded-t-md p-2 border-t-[1px] border-l-[1px] border-r-[1px] border-[#b32ed8]"><li>
-						Confirmar Presença
-					</li></a>
+					{!showList ? (
+						<a href="#presenca" className="text-gray-50 whitespace-nowrap opacity-70 hover:text-white hover:opacity-100 w-full cursor-pointer font-medium bg-[#d45df6] rounded-t-md p-2 border-t-[1px] border-l-[1px] border-r-[1px] border-[#b32ed8]"><li>
+							Confirmar Presença
+						</li></a>
+					) : (
+						<a href="#lista" className="text-gray-50 whitespace-nowrap opacity-70 hover:text-white hover:opacity-100 w-full cursor-pointer font-medium bg-[#d45df6] rounded-t-md p-2 border-t-[1px] border-l-[1px] border-r-[1px] border-[#b32ed8]"><li>
+							Lista de presentes
+						</li></a>
+					)}
 					<a href="#detalhes" className="text-gray-50 whitespace-nowrap opacity-70 hover:text-white hover:opacity-100 w-full cursor-pointer font-medium bg-[#d45df6] rounded-t-md p-2 border-t-[1px] border-l-[1px] border-r-[1px] border-[#b32ed8]">
 					<li>
 						+ Detalhes
@@ -189,150 +216,171 @@ function App() {
 				</section>
 
 				{/* ----------- PRESENÇA -----------  */}
-				<section className="w-full flex flex-col gap-5 mt-20">
-					<h2 id="presenca" className=" text-4xl md:text-5xl font-medium text-[#d45df6]">Confirme sua presença</h2>
-					{confirmMessage !== '' ? (
-						<div className="flex flex-col md:flex-row items-baseline gap-2">
-							<h2 className="whitespace-nowrap text-3xl font-medium text-[#d45df6]">{confirmMessage}</h2>
-							{confirmMessage === 'Obrigado!' ? (
-								<h2 className=" text-xl font-medium text-[#d45df6]">
-									{`Já temos ${guestsConfirmed} convidado${guestsConfirmed > 1 ? 's' : ''}`}
-								</h2>
-							) : null }
-						</div>
-					) : null}
-					<Formik
-          initialValues={initForm}
-          enableReinitialize={true}
-          validationSchema={validationSchema}
-          onSubmit={(values, { resetForm }) => {
-						// handleSubmit(values)
-          }}
-        >
-        {({
-          errors,
-          values,
-          touched,
-          isSubmitting,
-          setFieldValue,
-          handleBlur,
-					resetForm
-        }) => (
-          <Form>
-							<div className="flex items-center mt-5">
-								<Field
-									type="radio"
-									value="sim"
-									name="confirm"
-									id="confirm"
-									aria-describedby="confirm"
-									className="h-4 w-4 mr-2 border-gray-300 focus:ring-2 focus:ring-blue-300"
-								/>
-								<label className="text-[#b32ed8] font-medium" htmlFor="confirm">
-									Sim.
-									{values.confirm === "sim" ? (
-										<span className="text-sm text-zinc-600 ml-2">
-											Oba!
-										</span>
-									) : null }
-								</label>
+				{!showList ? (
+					<section className="w-full flex flex-col gap-5 mt-20">
+						<h2 id="presenca" className=" text-4xl md:text-5xl font-medium text-[#d45df6]">Confirme sua presença</h2>
+						{confirmMessage !== '' ? (
+							<div className="flex flex-col md:flex-row items-baseline gap-2">
+								<h2 className="whitespace-nowrap text-3xl font-medium text-[#d45df6]">{confirmMessage}</h2>
+								{confirmMessage === 'Obrigado!' ? (
+									<h2 className=" text-xl font-medium text-[#d45df6]">
+										{`Já temos ${guestsConfirmed} convidado${guestsConfirmed > 1 ? 's' : ''}`}
+									</h2>
+								) : null }
 							</div>
-
-							<div className="flex items-center">
-								<Field
-									type="radio"
-									value="nao"
-									name="confirm"
-									id="confirm"
-									className="h-4 w-4 mr-2 border-gray-300 focus:ring-2 focus:ring-blue-300"
+						) : null}
+						<Formik
+						initialValues={initForm}
+						enableReinitialize={true}
+						validationSchema={validationSchema}
+						onSubmit={(values, { resetForm }) => {
+							// handleSubmit(values)
+						}}
+					>
+					{({
+						errors,
+						values,
+						touched,
+						isSubmitting,
+						setFieldValue,
+						handleBlur,
+						resetForm
+					}) => (
+						<Form>
+								<div className="flex items-center mt-5">
+									<Field
+										type="radio"
+										value="sim"
+										name="confirm"
+										id="confirm"
+										aria-describedby="confirm"
+										className="h-4 w-4 mr-2 border-gray-300 focus:ring-2 focus:ring-blue-300"
 									/>
-								<label className="text-[#b32ed8] font-medium" htmlFor="confirm">
-									Não.
-									{values.confirm === "nao" ? (
-										<span className="text-sm text-zinc-600 ml-2">
-											Poxa.... :-(
-										</span>
-									) : null }
-								</label>
-							</div>
+									<label className="text-[#b32ed8] font-medium" htmlFor="confirm">
+										Sim.
+										{values.confirm === "sim" ? (
+											<span className="text-sm text-zinc-600 ml-2">
+												Oba!
+											</span>
+										) : null }
+									</label>
+								</div>
 
-							<div className="flex flex-col items-start justify-center mt-5">
-								<label className={`${values.confirm === false ? 'text-[#d45df6]' : 'text-[#b32ed8]'} font-medium`} htmlFor="name">
-									Nome e sobrenome
-									<span className="ml-4 text-xs font-normal text-red-600">{errors.name ? `${errors.name}` : ''}</span>
-								</label>
-								<Field
-									type="text"
-									name="name"
-									id="name"
-									placeholder="Digite seu nome"
-									className="h-10 w-full p-2 bg-zinc-50 placeholder:text-zinc-400 disabled:placeholder:text-zinc-300 disabled:text-zinc-300 rounded-lg text-[#b32ed8] font-medium border-[#b32ed8] focus:ring-2 focus:ring-[#b32ed8]"
-								/>
-							</div>
+								<div className="flex items-center">
+									<Field
+										type="radio"
+										value="nao"
+										name="confirm"
+										id="confirm"
+										className="h-4 w-4 mr-2 border-gray-300 focus:ring-2 focus:ring-blue-300"
+										/>
+									<label className="text-[#b32ed8] font-medium" htmlFor="confirm">
+										Não.
+										{values.confirm === "nao" ? (
+											<span className="text-sm text-zinc-600 ml-2">
+												Poxa.... :-(
+											</span>
+										) : null }
+									</label>
+								</div>
 
-							<div className="flex items-center mt-5">
-								<Field
-									disabled={values.confirm === "nao"}
-									type="checkbox"
-									name="has_escorts"
-									id="has_escorts"
-									className="h-4 w-4 mr-2 border-gray-300 focus:ring-2 focus:ring-blue-300"
-									aria-describedby="has_escorts"
-								/>
-								<label className={`${values.confirm === "nao" ? 'text-[#d45df6]' : 'text-[#b32ed8]'} font-medium`} htmlFor="has_escorts">
-									Acompanhantes.
-								</label>
-							</div>
-
-							{values.has_escorts ? (
 								<div className="flex flex-col items-start justify-center mt-5">
-									<label className={`${values.confirm === "nao" ? 'text-[#d45df6]' : 'text-[#b32ed8]'} font-medium`} htmlFor="escort_names">
-										Nome dos acompanhantes.
-										<span className={`${values.confirm === "nao" ? 'text-zinc-500 text-opacity-40' : 'text-zinc-500'} text-sm ml-2`}>
-											(Nomes separados por vírgula)
-										</span>
+									<label className={`${values.confirm === false ? 'text-[#d45df6]' : 'text-[#b32ed8]'} font-medium`} htmlFor="name">
+										Nome e sobrenome
+										<span className="ml-4 text-xs font-normal text-red-600">{errors.name ? `${errors.name}` : ''}</span>
 									</label>
 									<Field
-										disabled={values.confirm === "nao" || !values.has_escorts}
-										placeholder="Digite o nome dos acompanhantes"
-										type="input"
-										name="escort_names"
-										id="escort_names"
+										type="text"
+										name="name"
+										id="name"
+										placeholder="Digite seu nome"
 										className="h-10 w-full p-2 bg-zinc-50 placeholder:text-zinc-400 disabled:placeholder:text-zinc-300 disabled:text-zinc-300 rounded-lg text-[#b32ed8] font-medium border-[#b32ed8] focus:ring-2 focus:ring-[#b32ed8]"
 									/>
 								</div>
-							) : null}
 
-							<div className="flex flex-col items-start justify-center mt-5">
-								<label className={`${values.confirm === "nao" ? 'text-[#d45df6]' : 'text-[#b32ed8]'} font-medium`} htmlFor="message">
-									Deixe uma mensagem
-								</label>
-								<textarea
-									name="message"
-									value={values.message}
-									onChange={(e) => setFieldValue('message', e.target.value)}
-									id="message"
-									placeholder="Digite sua mensagem"
-									className="h-40 w-full p-2 align-top bg-zinc-50 placeholder:text-zinc-400 disabled:placeholder:text-zinc-300 disabled:text-zinc-300 rounded-lg text-[#b32ed8] font-medium border-[#b32ed8] focus:ring-2 focus:ring-[#b32ed8]"
-								/>
-							</div>
+								<div className="flex items-center mt-5">
+									<Field
+										disabled={values.confirm === "nao"}
+										type="checkbox"
+										name="has_escorts"
+										id="has_escorts"
+										className="h-4 w-4 mr-2 border-gray-300 focus:ring-2 focus:ring-blue-300"
+										aria-describedby="has_escorts"
+									/>
+									<label className={`${values.confirm === "nao" ? 'text-[#d45df6]' : 'text-[#b32ed8]'} font-medium`} htmlFor="has_escorts">
+										Acompanhantes.
+									</label>
+								</div>
 
-						{values.confirm !== null ? (
-							<button
-								type="submit"
-								onClick={() => handleSubmit(values, resetForm)}
-								disabled={disableButton || !!errors.name}
-								className="w-auto mt-5 cursor-pointer disabled:opacity-60 disabled:cursor-default disabled:bg-opacity-50 shadow-md border-[1px] border-[#b32ed8] bg-[#b32ed8] rounded-lg p-2"
-							>
-								{values.confirm === "sim" ? `Oba, confirme!` : `Poxa...`}
-							</button>
-						) : null }
+								{values.has_escorts ? (
+									<div className="flex flex-col items-start justify-center mt-5">
+										<label className={`${values.confirm === "nao" ? 'text-[#d45df6]' : 'text-[#b32ed8]'} font-medium`} htmlFor="escort_names">
+											Nome dos acompanhantes.
+											<span className={`${values.confirm === "nao" ? 'text-zinc-500 text-opacity-40' : 'text-zinc-500'} text-sm ml-2`}>
+												(Nomes separados por vírgula)
+											</span>
+										</label>
+										<Field
+											disabled={values.confirm === "nao" || !values.has_escorts}
+											placeholder="Digite o nome dos acompanhantes"
+											type="input"
+											name="escort_names"
+											id="escort_names"
+											className="h-10 w-full p-2 bg-zinc-50 placeholder:text-zinc-400 disabled:placeholder:text-zinc-300 disabled:text-zinc-300 rounded-lg text-[#b32ed8] font-medium border-[#b32ed8] focus:ring-2 focus:ring-[#b32ed8]"
+										/>
+									</div>
+								) : null}
 
-					{/* OUTROS DETALHES */}
-					</Form>
-					)}
-        </Formik>
-				</section>
+								<div className="flex flex-col items-start justify-center mt-5">
+									<label className={`${values.confirm === "nao" ? 'text-[#d45df6]' : 'text-[#b32ed8]'} font-medium`} htmlFor="message">
+										Deixe uma mensagem
+									</label>
+									<textarea
+										name="message"
+										value={values.message}
+										onChange={(e) => setFieldValue('message', e.target.value)}
+										id="message"
+										placeholder="Digite sua mensagem"
+										className="h-40 w-full p-2 align-top bg-zinc-50 placeholder:text-zinc-400 disabled:placeholder:text-zinc-300 disabled:text-zinc-300 rounded-lg text-[#b32ed8] font-medium border-[#b32ed8] focus:ring-2 focus:ring-[#b32ed8]"
+									/>
+								</div>
+
+							{values.confirm !== null ? (
+								<button
+									type="submit"
+									onClick={() => handleSubmit(values, resetForm)}
+									disabled={disableButton || !!errors.name}
+									className="w-auto mt-5 cursor-pointer disabled:opacity-60 disabled:cursor-default disabled:bg-opacity-50 shadow-md border-[1px] border-[#b32ed8] bg-[#b32ed8] rounded-lg p-2"
+								>
+									{values.confirm === "sim" ? `Oba, confirme!` : `Poxa...`}
+								</button>
+							) : null }
+
+						{/* OUTROS DETALHES */}
+						</Form>
+						)}
+					</Formik>
+					</section>
+				) : null}
+
+				{/* ----------- LISTA -----------  */}
+				{!showList ? (
+					<section id="lista" className="w-full flex flex-col justify-center items-center gap-5 mt-20">
+						<h2 id="presenca" className=" text-4xl md:text-5xl font-medium text-[#d45df6]">Lista de presentes</h2>
+						<p className="text-base">Em breve...</p>
+						<div className=" flex flex-wrap justify-center md:justify-start gap-5">
+							{lista.map((item, index) => {
+								return (
+									<div key={index} className="w-60 h-60 p-4 flex flex-col gap-2 items-center justify-center rounded-lg border-[1px] border-[#b32ed8] bg-fuchsia-300">
+										<h2 className="text-lg font-semibold">{item.nome}</h2>
+										<img src={item.img} alt={item.alt} className="w-auto h-3/4 rounded-lg object-cover opacity-60" />
+										<p className="text-base">Presentear com este</p>
+									</div>
+								)
+							})}
+						</div>
+					</section>
+				) : null}
 
 				{/* ----------- DETALHES -----------  */}
 				<section id="detalhes" className="w-full flex flex-col gap-5 mt-20">
@@ -344,6 +392,8 @@ function App() {
 						referrerPolicy="no-referrer-when-downgrade"
 					/>
 				</section>
+
+				{/*  */}
 			</div>
 
 			{/* ----------- GOTO_TOP ----------- */}
