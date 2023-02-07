@@ -10,7 +10,6 @@ import { Formik, Form, Field } from 'formik'
 import * as Yup from 'yup'
 
 import { lista } from './list'
-import ImgBaba from '../src/assets/baba-elet.webp'
 import "./App.css";
 
 const initForm = {
@@ -375,7 +374,7 @@ function App() {
 				) : null}
 
 				{/* ----------- LISTA -----------  */}
-				{!showList ? (
+				{showList ? (
 					<section id="lista" className="w-full flex flex-col justify-center items-center gap-5 mt-20">
 						<h2 id="presenca" className=" text-4xl md:text-5xl font-medium text-[#d45df6]">Lista de presentes</h2>
 						{/* <p className="text-base">Em breve...</p> */}
@@ -386,7 +385,7 @@ function App() {
 									<div key={index} className="w-60 h-60 p-4 flex flex-col gap-2 items-center justify-center rounded-lg border-[1px] border-[#b32ed8] bg-fuchsia-300">
 										<h2 className="text-lg font-semibold">{item.nome}</h2>
 										<img src={item.img} alt={item.alt} className="w-auto h-3/4 rounded-lg object-cover opacity-60" />
-										<p className="text-base">Presentear com este</p>
+										{/* <p className="text-base">Presentear com este</p> */}
 									</div>
 								)
 							})}
