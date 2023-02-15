@@ -22,7 +22,9 @@
 		"semi": "off",
 		"indent": "off",
 		"space-before-function-paren": "off",
-		"multiline-ternary": "off"
+		"multiline-ternary": "off",
+		"comma-dangle": "off",
+		"no-mixed-spaces-and-tabs": "off"
 	},
 	"settings": {
 		"react": {
